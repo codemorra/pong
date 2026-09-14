@@ -11,6 +11,8 @@ export class Game {
   private readonly ball: Ball;
   private readonly opponentPaddle: Paddle;
   private readonly computerOpponent: ComputerOpponent;
+  private playerScore = 0;
+  private opponentScore = 0;
   private lastFrameTime = performance.now();
 
   constructor(canvas: HTMLCanvasElement) {
@@ -70,7 +72,15 @@ export class Game {
     this.ball.bounceOff(this.opponentPaddle);
 
     if (this.ball.isOutside(this.canvas.width)) {
-      const horizontalDirection = this.ball.x < 0 ? 1 : -1;
+      const playerScored = this.ball.x > this.canvas.width;
+
+      if (playerScored) {
+        this.playerScore += 1;
+      } else {
+        this.opponentScore += 1;
+      }
+
+      const horizontalDirection = playerScored ? -1 : 1;
 
       this.ball.reset(
         this.canvas.width / 2,
@@ -83,6 +93,15 @@ export class Game {
   private render() {
     this.context.fillStyle = "#010305";
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.context.fillStyle = "#94a3b8";
+    this.context.font = "32px system-ui, sans-serif";
+    this.context.textAlign = "center";
+    this.context.fillText(
+      `${this.playerScore} : ${this.opponentScore}`,
+      this.canvas.width / 2,
+      48,
+    );
 
     this.player.draw(this.context);
     this.opponentPaddle.draw(this.context);
