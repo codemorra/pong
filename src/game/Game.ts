@@ -48,6 +48,8 @@ export class Game {
 
     this.ball.update(deltaTime, this.canvas.height);
 
+    this.ball.bounceOff(this.player);
+
     if (this.ball.isOutside(this.canvas.width)) {
       const horizontalDirection = this.ball.x < 0 ? 1 : -1;
 
