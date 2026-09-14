@@ -1,6 +1,7 @@
 import "./style.css";
 import { Game } from "./game/Game";
 
+// Create the page shell before attaching the canvas-based game.
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
   <main class="grid min-h-screen place-items-center bg-slate-950 p-6">
     <canvas
@@ -15,6 +16,7 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
   </main>
 `;
 
+// Retrieve the canvas created above so it can be passed to the game controller.
 const canvas = document.querySelector<HTMLCanvasElement>("#game-canvas");
 
 if (!canvas) {
