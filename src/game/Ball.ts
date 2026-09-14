@@ -83,6 +83,10 @@ export class Ball {
     this.velocityY = this.speed * impactPosition * 0.7;
   }
 
+  isMovingRight() {
+    return this.velocityX > 0;
+  }
+
   draw(context: CanvasRenderingContext2D) {
     context.fillStyle = "#f8fafc";
     context.beginPath();

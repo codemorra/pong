@@ -1,6 +1,7 @@
 import { Keyboard } from "../input/Keyboard";
 import { Paddle } from "./Paddle";
 import { Ball } from "./Ball";
+import { ComputerOpponent } from "./ComputerOpponent";
 
 export class Game {
   private readonly canvas: HTMLCanvasElement;
@@ -8,6 +9,8 @@ export class Game {
   private readonly keyboard = new Keyboard();
   private readonly player: Paddle;
   private readonly ball: Ball;
+  private readonly opponentPaddle: Paddle;
+  private readonly computerOpponent: ComputerOpponent;
   private lastFrameTime = performance.now();
 
   constructor(canvas: HTMLCanvasElement) {
@@ -20,6 +23,14 @@ export class Game {
     this.canvas = canvas;
     this.context = context;
     this.player = new Paddle(24, (canvas.height - 100) / 2, 16, 100, 420);
+    this.opponentPaddle = new Paddle(
+      canvas.width - 40,
+      (canvas.height - 100) / 2,
+      16,
+      100,
+      150,
+    );
+    this.computerOpponent = new ComputerOpponent(this.opponentPaddle);
     this.ball = new Ball(canvas.width / 2, canvas.height / 2, 10, 320);
   }
 
@@ -48,7 +59,15 @@ export class Game {
 
     this.ball.update(deltaTime, this.canvas.height);
 
+    this.computerOpponent.update(
+      this.ball.y,
+      this.ball.isMovingRight(),
+      deltaTime,
+      this.canvas.height,
+    );
+
     this.ball.bounceOff(this.player);
+    this.ball.bounceOff(this.opponentPaddle);
 
     if (this.ball.isOutside(this.canvas.width)) {
       const horizontalDirection = this.ball.x < 0 ? 1 : -1;
@@ -66,6 +85,7 @@ export class Game {
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.player.draw(this.context);
+    this.opponentPaddle.draw(this.context);
     this.ball.draw(this.context);
   }
 }
