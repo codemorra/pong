@@ -3,6 +3,7 @@ import { Paddle } from "./Paddle";
 import { Ball } from "./Ball";
 import { ComputerOpponent } from "./ComputerOpponent";
 import { AI_CONFIGURATIONS } from "./Difficulty";
+import type { AiConfiguration } from "./Difficulty";
 
 /** Coordinates the game loop, input, physics, scoring, and canvas rendering. */
 export class Game {
@@ -22,7 +23,10 @@ export class Game {
    *
    * @param canvas The canvas used as the game field.
    */
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    aiConfiguration: AiConfiguration = AI_CONFIGURATIONS.medium,
+  ) {
     const context = canvas.getContext("2d");
 
     if (!context) {
@@ -45,11 +49,11 @@ export class Game {
       (canvas.height - 100) / 2, // Vertically centered position
       16, // Paddle width
       100, // Paddle height
-      150, // Slower movement speed so the opponent can miss
+      aiConfiguration.maxPaddleSpeed, // Opponent movement speed based on AI configuration
     );
     this.computerOpponent = new ComputerOpponent(
       this.opponentPaddle,
-      AI_CONFIGURATIONS.medium,
+      aiConfiguration,
     );
     // Start a 10px-radius ball in the field center at 320px/s.
     this.ball = new Ball(canvas.width / 2, canvas.height / 2, 10, 320);
