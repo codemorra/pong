@@ -42,4 +42,13 @@ export class Keyboard {
       this.pressedKeys.delete(event.code);
     }
   };
+
+  /**
+   * Cleans up the keyboard event listeners and clears the pressed keys set.
+   */
+  destroy() {
+    window.removeEventListener("keydown", this.handleKeyDown);
+    window.removeEventListener("keyup", this.handleKeyUp);
+    this.pressedKeys.clear();
+  }
 }

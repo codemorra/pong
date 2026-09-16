@@ -85,7 +85,7 @@ function startGame(difficulty: Difficulty) {
     throw new Error("Game canvas could not be found.");
   }
 
-  new Game(canvas, AI_CONFIGURATIONS[difficulty]).start();
+  new Game(canvas, AI_CONFIGURATIONS[difficulty], showMenu).start();
 }
 
 showMenu();

@@ -17,6 +17,9 @@ export class Game {
   private playerScore = 0;
   private opponentScore = 0;
   private lastFrameTime = performance.now();
+  private readonly onReturnToMenu: () => void;
+  private animationFrameId: number | null = null;
+  private isRunning = false;
 
   /**
    * Creates the game objects and acquires the canvas drawing context.
@@ -26,6 +29,7 @@ export class Game {
   constructor(
     canvas: HTMLCanvasElement,
     aiConfiguration: AiConfiguration = AI_CONFIGURATIONS.medium,
+    onReturnToMenu: () => void = () => {},
   ) {
     const context = canvas.getContext("2d");
 
@@ -35,6 +39,8 @@ export class Game {
 
     this.canvas = canvas;
     this.context = context;
+    this.onReturnToMenu = onReturnToMenu;
+    window.addEventListener("keydown", this.handleKeyDown);
     // Place the player 24px from the left edge; its 16×100px paddle moves at 420px/s.
     this.player = new Paddle(
       24, // Distance from the left edge
@@ -61,7 +67,29 @@ export class Game {
 
   /** Starts the browser animation loop. */
   start() {
-    requestAnimationFrame(this.gameLoop);
+    if (this.isRunning) {
+      return;
+    }
+
+    this.isRunning = true;
+    this.lastFrameTime = performance.now();
+    this.animationFrameId = requestAnimationFrame(this.gameLoop);
+  }
+
+  stop() {
+    if (!this.isRunning) {
+      return;
+    }
+
+    this.isRunning = false;
+
+    if (this.animationFrameId !== null) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+
+    window.removeEventListener("keydown", this.handleKeyDown);
+    this.keyboard.destroy();
   }
 
   /**
@@ -72,11 +100,15 @@ export class Game {
   private gameLoop = (currentTime: number) => {
     const deltaTime = Math.min((currentTime - this.lastFrameTime) / 1000, 0.05);
 
+    if (!this.isRunning) {
+      return;
+    }
+
     this.lastFrameTime = currentTime;
     this.update(deltaTime);
     this.render();
 
-    requestAnimationFrame(this.gameLoop);
+    this.animationFrameId = requestAnimationFrame(this.gameLoop);
   };
 
   /**
@@ -144,4 +176,15 @@ export class Game {
     this.opponentPaddle.draw(this.context);
     this.ball.draw(this.context);
   }
+
+  /** Handles the Escape key to stop the game and return to the menu. */
+  private handleKeyDown = (event: KeyboardEvent) => {
+    if (event.code !== "Escape") {
+      return;
+    }
+
+    event.preventDefault();
+    this.stop();
+    this.onReturnToMenu();
+  };
 }
