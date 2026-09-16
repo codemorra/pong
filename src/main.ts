@@ -11,6 +11,7 @@ if (!appElement) {
 
 const app: HTMLDivElement = appElement;
 
+/** Renders the difficulty-selection menu and connects its buttons. */
 function showMenu() {
   app.innerHTML = `
     <main class="grid min-h-screen place-items-center bg-slate-950 p-6 text-slate-100">
@@ -64,6 +65,11 @@ function showMenu() {
   });
 }
 
+/**
+ * Renders a new game field and starts a game using the selected difficulty.
+ *
+ * @param difficulty Selected AI difficulty.
+ */
 function startGame(difficulty: Difficulty) {
   app.innerHTML = `
     <main class="grid min-h-screen place-items-center bg-slate-950 p-6">

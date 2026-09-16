@@ -25,6 +25,8 @@ export class Game {
    * Creates the game objects and acquires the canvas drawing context.
    *
    * @param canvas The canvas used as the game field.
+   * @param aiConfiguration Difficulty settings for the computer opponent.
+   * @param onReturnToMenu Callback invoked after Escape stops the game.
    */
   constructor(
     canvas: HTMLCanvasElement,
@@ -76,6 +78,7 @@ export class Game {
     this.animationFrameId = requestAnimationFrame(this.gameLoop);
   }
 
+  /** Stops the animation loop and releases all game-specific keyboard listeners. */
   stop() {
     if (!this.isRunning) {
       return;
