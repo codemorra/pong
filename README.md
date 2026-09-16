@@ -1,6 +1,6 @@
 # Pong
 
-A small, classic Pong game built for the browser. Play against a simple computer opponent with `W`/`S` or the arrow keys.
+A small, classic Pong game built for the browser. Choose a difficulty and play against a computer opponent with `W`/`S` or the arrow keys.
 
 ## Live preview
 
@@ -31,11 +31,16 @@ The generated files are written to `dist/` and can be served by any static web s
 | --- | --- |
 | `W` or `ArrowUp` | Move the player paddle up |
 | `S` or `ArrowDown` | Move the player paddle down |
+| `Escape` | Return to the main menu |
+
+## Difficulty levels
+
+The main menu offers three difficulty levels: `Easy`, `Medium`, and `Hard`.
+They use shared AI configurations that control reaction delay, maximum paddle speed, and the paddle height perceived by the computer opponent.
 
 ## Planned improvements
 
 - Visual improvements for the game field.
-- Improved computer opponent behavior.
 - Pause and restart controls.
 - Additional game modes.
 - An expanded scoring system.

@@ -1,7 +1,7 @@
 import { Paddle } from "./Paddle";
 import type { AiConfiguration } from "./Difficulty";
 
-/** Controls the computer paddle with a deliberately simple ball-following strategy. */
+/** Controls the computer paddle using the selected AI configuration. */
 export class ComputerOpponent {
   private readonly paddle: Paddle; // The paddle controlled by this computer opponent.
   private targetPosition: number | null = null; // The relative point on the paddle the ball is targeting.
@@ -14,7 +14,7 @@ export class ComputerOpponent {
    * Creates the controller for the computer-controlled paddle.
    *
    * @param paddle Paddle controlled by this opponent.
-   * @param trackingTolerance Distance in pixels where the paddle stops adjusting.
+   * @param configuration The AI configuration for this opponent.
    */
   constructor(paddle: Paddle, configuration: AiConfiguration) {
     this.paddle = paddle;
@@ -24,6 +24,8 @@ export class ComputerOpponent {
   /**
    * Moves the opponent towards an approaching ball.
    * It intentionally does not track balls moving away, which gives the player an advantage.
+   * A target position is selected once for every incoming ball and is
+   * refreshed only after the configured reaction delay.
    *
    * @param ballY Current vertical center position of the ball.
    * @param isBallApproaching Whether the ball is travelling towards the opponent.
@@ -52,7 +54,7 @@ export class ComputerOpponent {
       this.desiredPaddleY =
         ballY - this.configuration.perceivedPaddleHeight * this.targetPosition;
 
-      // Ensure the desired paddle position is within the field boundaries.
+      // Wait for the configured delay before the first target refresh.
       this.reactionTimer = this.configuration.reactionDelay;
     }
 
@@ -63,7 +65,7 @@ export class ComputerOpponent {
       this.desiredPaddleY =
         ballY - this.configuration.perceivedPaddleHeight * this.targetPosition;
 
-      // Reset the reaction timer to introduce a delay before the next adjustment.
+      // Wait for the configured delay before the next target refresh.
       this.reactionTimer = this.configuration.reactionDelay;
     }
 
