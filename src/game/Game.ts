@@ -2,6 +2,7 @@ import { Keyboard } from "../input/Keyboard";
 import { Paddle } from "./Paddle";
 import { Ball } from "./Ball";
 import { ComputerOpponent } from "./ComputerOpponent";
+import { AI_CONFIGURATIONS } from "./Difficulty";
 
 /** Coordinates the game loop, input, physics, scoring, and canvas rendering. */
 export class Game {
@@ -46,7 +47,10 @@ export class Game {
       100, // Paddle height
       150, // Slower movement speed so the opponent can miss
     );
-    this.computerOpponent = new ComputerOpponent(this.opponentPaddle);
+    this.computerOpponent = new ComputerOpponent(
+      this.opponentPaddle,
+      AI_CONFIGURATIONS.medium,
+    );
     // Start a 10px-radius ball in the field center at 320px/s.
     this.ball = new Ball(canvas.width / 2, canvas.height / 2, 10, 320);
   }

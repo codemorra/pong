@@ -1,4 +1,5 @@
 import { Paddle } from "./Paddle";
+import type { AiConfiguration } from "./Difficulty";
 
 /** Controls the computer paddle with a deliberately simple ball-following strategy. */
 export class ComputerOpponent {
@@ -6,8 +7,8 @@ export class ComputerOpponent {
   private targetPosition: number | null = null; // The relative point on the paddle the ball is targeting.
   private desiredPaddleY: number | null = null; // The vertical position the paddle aims to reach.
   private reactionTimer = 0; // Current countdown timer for the reaction delay.
-  private readonly reactionDelay = 0.2; // Time in seconds before the paddle reacts to a new ball position.
   private readonly targetTolerance = 4; // Distance in pixels where the paddle stops adjusting.
+  private readonly configuration: AiConfiguration; // The AI configuration for this opponent.
 
   /**
    * Creates the controller for the computer-controlled paddle.
@@ -15,8 +16,9 @@ export class ComputerOpponent {
    * @param paddle Paddle controlled by this opponent.
    * @param trackingTolerance Distance in pixels where the paddle stops adjusting.
    */
-  constructor(paddle: Paddle) {
+  constructor(paddle: Paddle, configuration: AiConfiguration) {
     this.paddle = paddle;
+    this.configuration = configuration;
   }
 
   /**
@@ -47,20 +49,22 @@ export class ComputerOpponent {
       this.targetPosition = 0.15 + Math.random() * 0.7;
 
       // Calculate the initial desired paddle position based on the target point.
-      this.desiredPaddleY = ballY - this.paddle.height * this.targetPosition;
+      this.desiredPaddleY =
+        ballY - this.configuration.perceivedPaddleHeight * this.targetPosition;
 
       // Ensure the desired paddle position is within the field boundaries.
-      this.reactionTimer = this.reactionDelay;
+      this.reactionTimer = this.configuration.reactionDelay;
     }
 
     this.reactionTimer -= deltaTime;
 
     if (this.reactionTimer <= 0) {
       // Recalculate the desired paddle position after the reaction delay.
-      this.desiredPaddleY = ballY - this.paddle.height * this.targetPosition;
+      this.desiredPaddleY =
+        ballY - this.configuration.perceivedPaddleHeight * this.targetPosition;
 
       // Reset the reaction timer to introduce a delay before the next adjustment.
-      this.reactionTimer = this.reactionDelay;
+      this.reactionTimer = this.configuration.reactionDelay;
     }
 
     // If the desired paddle position is not set, no movement is needed.
