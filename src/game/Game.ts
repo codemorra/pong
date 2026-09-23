@@ -29,7 +29,8 @@ export class Game {
    *
    * @param canvas The canvas used as the game field.
    * @param aiConfiguration Difficulty settings for the computer opponent.
-   * @param onReturnToMenu Callback invoked after Escape stops the game.
+   * @param onReturnToMenu Callback invoked when returning to the menu.
+   * @param onRestart Callback invoked when restarting the game.
    */
   constructor(
     canvas: HTMLCanvasElement,
@@ -230,7 +231,7 @@ export class Game {
 
   /** Handles key down events for pausing and exiting the game. */
   private handleKeyDown = (event: KeyboardEvent) => {
-    // Handle key events when the restart confirmation overlay is open.
+    // Handle key events when a pending confirmation overlay is open.
     if (this.pendingConfirmation !== null) {
       if (event.code === "Enter" && !event.repeat) {
         event.preventDefault();

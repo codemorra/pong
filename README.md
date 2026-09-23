@@ -27,11 +27,13 @@ The generated files are written to `dist/` and can be served by any static web s
 
 ## Controls
 
-| Key | Action |
-| --- | --- |
-| `W` or `ArrowUp` | Move the player paddle up |
-| `S` or `ArrowDown` | Move the player paddle down |
-| `Escape` | Return to the main menu |
+| Key                | Action                                  |
+| ------------------ | --------------------------------------- |
+| `W` or `ArrowUp`   | Move the player paddle up               |
+| `S` or `ArrowDown` | Move the player paddle down             |
+| `P`                | Pause or resume the game                |
+| `R`                | Ask to restart with the same difficulty |
+| `Escape`           | Ask to return to the main menu          |
 
 ## Difficulty levels
 
@@ -41,7 +43,6 @@ They use shared AI configurations that control reaction delay, maximum paddle sp
 ## Planned improvements
 
 - Visual improvements for the game field.
-- Pause and restart controls.
 - Additional game modes.
 - An expanded scoring system.
 
