@@ -22,7 +22,7 @@ export class Game {
   private isRunning = false;
   private isPaused = false;
   private readonly onRestart: () => void;
-  private isRestartConfirmationOpen = false;
+  private pendingConfirmation: "restart" | "menu" | null = null;
 
   /**
    * Creates the game objects and acquires the canvas drawing context.
@@ -114,7 +114,7 @@ export class Game {
 
     // Update the last frame time and conditionally update the game state based on pause and restart confirmation status.
     this.lastFrameTime = currentTime;
-    if (!this.isPaused && !this.isRestartConfirmationOpen) {
+    if (!this.isPaused && this.pendingConfirmation === null) {
       this.update(deltaTime);
     }
 
@@ -188,8 +188,8 @@ export class Game {
     this.opponentPaddle.draw(this.context);
     this.ball.draw(this.context);
 
-    // Render the restart confirmation overlay if it is open.
-    if (this.isRestartConfirmationOpen) {
+    // Render the pending confirmation overlay if it is open.
+    if (this.pendingConfirmation !== null) {
       this.context.fillStyle = "rgba(2, 6, 23, 0.85)";
       this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -197,14 +197,18 @@ export class Game {
       this.context.textAlign = "center";
       this.context.font = "32px system-ui, sans-serif";
       this.context.fillText(
-        "RESTART GAME?",
+        this.pendingConfirmation === "restart"
+          ? "RESTART GAME?"
+          : "RETURN TO MENU?",
         this.canvas.width / 2,
         this.canvas.height / 2 - 20,
       );
 
       this.context.font = "18px system-ui, sans-serif";
       this.context.fillText(
-        "Enter: restart  ·  Escape: cancel",
+        this.pendingConfirmation === "restart"
+          ? "Enter: restart  ·  Escape: cancel"
+          : "Enter: return to menu  ·  Escape: cancel",
         this.canvas.width / 2,
         this.canvas.height / 2 + 28,
       );
@@ -227,14 +231,23 @@ export class Game {
   /** Handles key down events for pausing and exiting the game. */
   private handleKeyDown = (event: KeyboardEvent) => {
     // Handle key events when the restart confirmation overlay is open.
-    if (this.isRestartConfirmationOpen) {
+    if (this.pendingConfirmation !== null) {
       if (event.code === "Enter" && !event.repeat) {
         event.preventDefault();
+        const action = this.pendingConfirmation;
         this.stop();
-        this.onRestart();
+
+        if (action === "restart") {
+          this.onRestart();
+        } else {
+          this.onReturnToMenu();
+        }
       } else if (event.code === "Escape") {
         event.preventDefault();
-        this.isRestartConfirmationOpen = false;
+
+        if (!event.repeat) {
+          this.pendingConfirmation = null;
+        }
       }
 
       return;
@@ -256,19 +269,19 @@ export class Game {
       event.preventDefault();
 
       if (!event.repeat) {
-        this.isRestartConfirmationOpen = true;
+        this.pendingConfirmation = "restart";
       }
 
       return;
     }
 
     // Handle the Escape key to stop the game and return to the menu.
-    if (event.code !== "Escape") {
-      return;
-    }
+    if (event.code === "Escape") {
+      event.preventDefault();
 
-    event.preventDefault();
-    this.stop();
-    this.onReturnToMenu();
+      if (!event.repeat) {
+        this.pendingConfirmation = "menu";
+      }
+    }
   };
 }
