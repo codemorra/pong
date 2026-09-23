@@ -20,6 +20,7 @@ export class Game {
   private readonly onReturnToMenu: () => void;
   private animationFrameId: number | null = null;
   private isRunning = false;
+  private isPaused = false;
 
   /**
    * Creates the game objects and acquires the canvas drawing context.
@@ -108,7 +109,10 @@ export class Game {
     }
 
     this.lastFrameTime = currentTime;
-    this.update(deltaTime);
+    if (!this.isPaused) {
+      this.update(deltaTime);
+    }
+
     this.render();
 
     this.animationFrameId = requestAnimationFrame(this.gameLoop);
@@ -178,10 +182,37 @@ export class Game {
     this.player.draw(this.context);
     this.opponentPaddle.draw(this.context);
     this.ball.draw(this.context);
+
+    // Overlay a paused screen if the game is currently paused.
+    if (this.isPaused) {
+      this.context.fillStyle = "rgba(2, 6, 23, 0.75)";
+      this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+      this.context.fillStyle = "#f8fafc";
+      this.context.font = "40px system-ui, sans-serif";
+      this.context.textAlign = "center";
+      this.context.fillText(
+        "PAUSED",
+        this.canvas.width / 2,
+        this.canvas.height / 2,
+      );
+    }
   }
 
-  /** Handles the Escape key to stop the game and return to the menu. */
+  /** Handles key down events for pausing and exiting the game. */
   private handleKeyDown = (event: KeyboardEvent) => {
+    // Handle the "P" key to toggle the paused state of the game.
+    if (event.code === "KeyP") {
+      event.preventDefault();
+
+      if (!event.repeat) {
+        this.isPaused = !this.isPaused;
+      }
+
+      return;
+    }
+
+    // Handle the Escape key to stop the game and return to the menu.
     if (event.code !== "Escape") {
       return;
     }
