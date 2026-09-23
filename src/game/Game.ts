@@ -21,6 +21,8 @@ export class Game {
   private animationFrameId: number | null = null;
   private isRunning = false;
   private isPaused = false;
+  private readonly onRestart: () => void;
+  private isRestartConfirmationOpen = false;
 
   /**
    * Creates the game objects and acquires the canvas drawing context.
@@ -33,6 +35,7 @@ export class Game {
     canvas: HTMLCanvasElement,
     aiConfiguration: AiConfiguration = AI_CONFIGURATIONS.medium,
     onReturnToMenu: () => void = () => {},
+    onRestart: () => void = () => {},
   ) {
     const context = canvas.getContext("2d");
 
@@ -43,6 +46,7 @@ export class Game {
     this.canvas = canvas;
     this.context = context;
     this.onReturnToMenu = onReturnToMenu;
+    this.onRestart = onRestart;
     window.addEventListener("keydown", this.handleKeyDown);
     // Place the player 24px from the left edge; its 16×100px paddle moves at 420px/s.
     this.player = new Paddle(
@@ -108,8 +112,9 @@ export class Game {
       return;
     }
 
+    // Update the last frame time and conditionally update the game state based on pause and restart confirmation status.
     this.lastFrameTime = currentTime;
-    if (!this.isPaused) {
+    if (!this.isPaused && !this.isRestartConfirmationOpen) {
       this.update(deltaTime);
     }
 
@@ -183,8 +188,28 @@ export class Game {
     this.opponentPaddle.draw(this.context);
     this.ball.draw(this.context);
 
-    // Overlay a paused screen if the game is currently paused.
-    if (this.isPaused) {
+    // Render the restart confirmation overlay if it is open.
+    if (this.isRestartConfirmationOpen) {
+      this.context.fillStyle = "rgba(2, 6, 23, 0.85)";
+      this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+      this.context.fillStyle = "#f8fafc";
+      this.context.textAlign = "center";
+      this.context.font = "32px system-ui, sans-serif";
+      this.context.fillText(
+        "RESTART GAME?",
+        this.canvas.width / 2,
+        this.canvas.height / 2 - 20,
+      );
+
+      this.context.font = "18px system-ui, sans-serif";
+      this.context.fillText(
+        "Enter: restart  ·  Escape: cancel",
+        this.canvas.width / 2,
+        this.canvas.height / 2 + 28,
+      );
+    } else if (this.isPaused) {
+      // Overlay a paused screen if the game is currently paused.
       this.context.fillStyle = "rgba(2, 6, 23, 0.75)";
       this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -201,12 +226,37 @@ export class Game {
 
   /** Handles key down events for pausing and exiting the game. */
   private handleKeyDown = (event: KeyboardEvent) => {
+    // Handle key events when the restart confirmation overlay is open.
+    if (this.isRestartConfirmationOpen) {
+      if (event.code === "Enter" && !event.repeat) {
+        event.preventDefault();
+        this.stop();
+        this.onRestart();
+      } else if (event.code === "Escape") {
+        event.preventDefault();
+        this.isRestartConfirmationOpen = false;
+      }
+
+      return;
+    }
+
     // Handle the "P" key to toggle the paused state of the game.
     if (event.code === "KeyP") {
       event.preventDefault();
 
       if (!event.repeat) {
         this.isPaused = !this.isPaused;
+      }
+
+      return;
+    }
+
+    // Handle the "R" key to restart the game.
+    if (event.code === "KeyR") {
+      event.preventDefault();
+
+      if (!event.repeat) {
+        this.isRestartConfirmationOpen = true;
       }
 
       return;
